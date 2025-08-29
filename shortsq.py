@@ -6,13 +6,19 @@ import yfinance as yf
 import numpy as np
 from typing import Optional, List
 
+# -----------------------------
+
+# Streamlit Page Config
+
+# -----------------------------
+
 st.set\_page\_config(page\_title="S\&P 500 Short Squeeze Scanner", layout="wide")
 st.title("📈 S\&P 500 Short Squeeze Scanner")
 st.markdown("This app scans S\&P 500 stocks for potential short squeeze candidates based on short interest, borrow fees, liquidity, and momentum.")
 
 # -----------------------------
 
-# Core Scanner Logic
+# Scanner Configuration
 
 # -----------------------------
 
@@ -39,12 +45,6 @@ self.score = None
 # Helper Functions
 
 # -----------------------------
-
-def safe\_pct(a: float, b: float) -> Optional\[float]:
-try:
-return float(a)/float(b) if b else None
-except:
-return None
 
 def compute\_adv(df: pd.DataFrame, window\:int) -> Optional\[float]:
 try:
@@ -87,14 +87,12 @@ return float(np.dot(parts,weights)/sum(weights)) if parts else 0.0
 
 # -----------------------------
 
-# Fetch Live S\&P 500 Tickers
+# Fetch S\&P 500 Tickers
 
 # -----------------------------
 
 def get\_sp500\_tickers() -> List\[str]:
 try:
-spy = yf.Ticker("SPY")
-\# yfinance does not always provide holdings, fallback to Wikipedia
 tables = pd.read\_html("[https://en.wikipedia.org/wiki/List\_of\_S%26P\_500\_companies](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies)")
 tickers = tables\[0]\['Symbol'].str.upper().tolist()
 return tickers
@@ -129,7 +127,6 @@ for t in universe:
         m.vol90_annual = compute_volatility(df,lookback)
         m.mom_20d = compute_momentum(df,20)
         m.mom_5d = compute_momentum(df,5)
-        # Placeholders for optional data
         m.dtc = None
         m.sipf = None
         m.borrow_fee = None
